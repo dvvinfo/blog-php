@@ -1,7 +1,7 @@
 <?php
 $pageTitle = htmlspecialchars($post->title);
 require_once __DIR__ . '/../layouts/header.php';
-$currentUserId = Session::getUserId();
+$currentUserId = JWTMiddleware::getUserId();
 $isOwner = $currentUserId === $post->user_id;
 ?>
 
@@ -69,9 +69,9 @@ $isOwner = $currentUserId === $post->user_id;
 
     <?php if ($isAuthenticated): ?>
         <?php 
-        $commentErrors = Session::get('comment_errors');
-        if ($commentErrors) {
-            Session::set('comment_errors', null);
+        $commentErrors = isset($_COOKIE['comment_errors']) ? json_decode($_COOKIE['comment_errors'], true) : [];
+        if (!empty($commentErrors)) {
+            setcookie('comment_errors', '', time() - 3600, '/');
         }
         ?>
         <?php if (!empty($commentErrors)): ?>

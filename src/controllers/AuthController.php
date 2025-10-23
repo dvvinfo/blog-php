@@ -1,13 +1,14 @@
 <?php
 
 require_once __DIR__ . '/../models/User.php';
-require_once __DIR__ . '/../../utils/Session.php';
+require_once __DIR__ . '/../../utils/JWT.php';
+require_once __DIR__ . '/../middleware/JWTMiddleware.php';
 require_once __DIR__ . '/../../utils/Validator.php';
 
 /**
  * Authentication Controller
  * 
- * Handles user registration, login, and logout
+ * Handles user registration, login, and logout with JWT
  */
 class AuthController
 {
@@ -16,14 +17,7 @@ class AuthController
      */
     public static function showRegisterForm(): void
     {
-        Session::start();
-        
-        // Redirect if already authenticated
-        if (Session::isAuthenticated()) {
-            header('Location: /');
-            exit;
-        }
-
+        JWTMiddleware::requireGuest();
         require __DIR__ . '/../../views/auth/register.php';
     }
 
@@ -32,8 +26,6 @@ class AuthController
      */
     public static function register(): void
     {
-        Session::start();
-
         $errors = [];
         $login = $_POST['login'] ?? '';
         $password = $_POST['password'] ?? '';
@@ -79,9 +71,13 @@ class AuthController
             return;
         }
 
-        // Create session
-        Session::set('user_id', $user->id);
-        Session::set('user_login', $user->login);
+        // Generate JWT tokens
+        $accessToken = JWT::generateAccessToken($user->id, $user->login);
+        $refreshToken = JWT::generateRefreshToken($user->id);
+
+        // Set tokens in cookies
+        JWT::setTokenCookie('access_token', $accessToken, 900); // 15 minutes
+        JWT::setTokenCookie('refresh_token', $refreshToken, 604800); // 7 days
 
         // Redirect to home
         header('Location: /');
@@ -93,14 +89,7 @@ class AuthController
      */
     public static function showLoginForm(): void
     {
-        Session::start();
-        
-        // Redirect if already authenticated
-        if (Session::isAuthenticated()) {
-            header('Location: /');
-            exit;
-        }
-
+        JWTMiddleware::requireGuest();
         require __DIR__ . '/../../views/auth/login.php';
     }
 
@@ -109,8 +98,6 @@ class AuthController
      */
     public static function login(): void
     {
-        Session::start();
-
         $errors = [];
         $login = $_POST['login'] ?? '';
         $password = $_POST['password'] ?? '';
@@ -132,9 +119,13 @@ class AuthController
             return;
         }
 
-        // Create session
-        Session::set('user_id', $user->id);
-        Session::set('user_login', $user->login);
+        // Generate JWT tokens
+        $accessToken = JWT::generateAccessToken($user->id, $user->login);
+        $refreshToken = JWT::generateRefreshToken($user->id);
+
+        // Set tokens in cookies
+        JWT::setTokenCookie('access_token', $accessToken, 900); // 15 minutes
+        JWT::setTokenCookie('refresh_token', $refreshToken, 604800); // 7 days
 
         // Redirect to home
         header('Location: /');
@@ -146,7 +137,16 @@ class AuthController
      */
     public static function logout(): void
     {
-        Session::destroy();
+        // Get refresh token and revoke it
+        $refreshToken = JWT::getTokenFromCookie('refresh_token');
+        if ($refreshToken) {
+            JWT::revokeRefreshToken($refreshToken);
+        }
+
+        // Delete token cookies
+        JWT::deleteTokenCookie('access_token');
+        JWT::deleteTokenCookie('refresh_token');
+
         header('Location: /login');
         exit;
     }

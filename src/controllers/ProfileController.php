@@ -1,8 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../models/Post.php';
-require_once __DIR__ . '/../middleware/AuthMiddleware.php';
-require_once __DIR__ . '/../../utils/Session.php';
+require_once __DIR__ . '/../middleware/JWTMiddleware.php';
 
 /**
  * Profile Controller
@@ -16,10 +15,9 @@ class ProfileController
      */
     public static function analytics(): void
     {
-        AuthMiddleware::requireAuth();
-        Session::start();
+        JWTMiddleware::requireAuth();
 
-        $userId = Session::getUserId();
+        $userId = JWTMiddleware::getUserId();
         
         // Get user posts
         $userPosts = Post::findByUserId($userId);

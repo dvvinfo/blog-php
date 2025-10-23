@@ -1,8 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../models/Post.php';
-require_once __DIR__ . '/../middleware/AuthMiddleware.php';
-require_once __DIR__ . '/../../utils/Session.php';
+require_once __DIR__ . '/../middleware/JWTMiddleware.php';
 require_once __DIR__ . '/../../utils/Validator.php';
 
 /**
@@ -17,7 +16,6 @@ class PostController
      */
     public static function index(): void
     {
-        Session::start();
         $posts = Post::findAll();
         require __DIR__ . '/../../views/posts/index.php';
     }
@@ -29,8 +27,6 @@ class PostController
      */
     public static function show(int $id): void
     {
-        Session::start();
-        
         $post = Post::findById($id);
 
         if (!$post) {
@@ -54,8 +50,7 @@ class PostController
      */
     public static function showCreateForm(): void
     {
-        AuthMiddleware::requireAuth();
-        Session::start();
+        JWTMiddleware::requireAuth();
         require __DIR__ . '/../../views/posts/create.php';
     }
 
@@ -64,8 +59,7 @@ class PostController
      */
     public static function create(): void
     {
-        AuthMiddleware::requireAuth();
-        Session::start();
+        JWTMiddleware::requireAuth();
 
         $errors = [];
         $title = $_POST['title'] ?? '';
@@ -90,7 +84,7 @@ class PostController
         }
 
         // Create post
-        $userId = Session::getUserId();
+        $userId = JWTMiddleware::getUserId();
         $post = Post::create($userId, $title, $content);
 
         if ($post === false) {
@@ -111,8 +105,7 @@ class PostController
      */
     public static function showEditForm(int $id): void
     {
-        AuthMiddleware::requirePostOwner($id);
-        Session::start();
+        JWTMiddleware::requirePostOwner($id);
 
         $post = Post::findById($id);
         require __DIR__ . '/../../views/posts/edit.php';
@@ -125,8 +118,7 @@ class PostController
      */
     public static function edit(int $id): void
     {
-        AuthMiddleware::requirePostOwner($id);
-        Session::start();
+        JWTMiddleware::requirePostOwner($id);
 
         $post = Post::findById($id);
         $errors = [];
@@ -172,7 +164,7 @@ class PostController
      */
     public static function delete(int $id): void
     {
-        AuthMiddleware::requirePostOwner($id);
+        JWTMiddleware::requirePostOwner($id);
 
         $post = Post::findById($id);
         $post->delete();
@@ -188,7 +180,7 @@ class PostController
      */
     public static function like(int $id): void
     {
-        AuthMiddleware::requireAuth();
+        JWTMiddleware::requireAuth();
 
         $post = Post::findById($id);
 
@@ -211,7 +203,7 @@ class PostController
      */
     public static function dislike(int $id): void
     {
-        AuthMiddleware::requireAuth();
+        JWTMiddleware::requireAuth();
 
         $post = Post::findById($id);
 

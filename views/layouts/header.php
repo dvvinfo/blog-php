@@ -1,8 +1,7 @@
 <?php
-require_once __DIR__ . '/../../utils/Session.php';
-Session::start();
-$isAuthenticated = Session::isAuthenticated();
-$userLogin = Session::get('user_login');
+require_once __DIR__ . '/../../src/middleware/JWTMiddleware.php';
+$isAuthenticated = JWTMiddleware::isAuthenticated();
+$userLogin = JWTMiddleware::getUserLogin();
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -31,7 +30,7 @@ $userLogin = Session::get('user_login');
                     </div>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <?php if ($isAuthenticated): ?>
+                    <?php if ($isAuthenticated && $userLogin): ?>
                         <span class="text-gray-700">Привет, <strong><?= htmlspecialchars($userLogin) ?></strong></span>
                         <a href="/logout" class="py-2 px-4 bg-red-500 hover:bg-red-600 text-white rounded transition duration-300">Выход</a>
                     <?php else: ?>

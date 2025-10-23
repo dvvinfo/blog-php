@@ -3,23 +3,24 @@
 /**
  * Application Entry Point
  * 
- * Main router and application bootstrap
+ * Main router and application bootstrap with JWT authentication
  */
 
 // Error reporting for development
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Autoload dependencies
+// Autoload Composer dependencies
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Autoload application dependencies
 require_once __DIR__ . '/../utils/Router.php';
-require_once __DIR__ . '/../utils/Session.php';
+require_once __DIR__ . '/../utils/JWT.php';
+require_once __DIR__ . '/../src/middleware/JWTMiddleware.php';
 require_once __DIR__ . '/../src/controllers/AuthController.php';
 require_once __DIR__ . '/../src/controllers/PostController.php';
 require_once __DIR__ . '/../src/controllers/CommentController.php';
 require_once __DIR__ . '/../src/controllers/ProfileController.php';
-
-// Initialize session
-Session::start();
 
 // Create router instance
 $router = new Router();

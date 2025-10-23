@@ -2,8 +2,7 @@
 
 require_once __DIR__ . '/../models/Comment.php';
 require_once __DIR__ . '/../models/Post.php';
-require_once __DIR__ . '/../middleware/AuthMiddleware.php';
-require_once __DIR__ . '/../../utils/Session.php';
+require_once __DIR__ . '/../middleware/JWTMiddleware.php';
 require_once __DIR__ . '/../../utils/Validator.php';
 
 /**
@@ -20,8 +19,7 @@ class CommentController
      */
     public static function create(int $post_id): void
     {
-        AuthMiddleware::requireAuth();
-        Session::start();
+        JWTMiddleware::requireAuth();
 
         // Check if post exists
         $post = Post::findById($post_id);
@@ -42,18 +40,18 @@ class CommentController
 
         // If validation fails, redirect back with error
         if (!empty($errors)) {
-            // Store errors in session for display
-            Session::set('comment_errors', $errors);
+            // Store errors in cookie for display
+            setcookie('comment_errors', json_encode($errors), time() + 60, '/');
             header('Location: /posts/' . $post_id);
             exit;
         }
 
         // Create comment
-        $userId = Session::getUserId();
+        $userId = JWTMiddleware::getUserId();
         $comment = Comment::create($post_id, $userId, $text);
 
         if ($comment === false) {
-            Session::set('comment_errors', ['Ошибка при создании комментария']);
+            setcookie('comment_errors', json_encode(['Ошибка при создании комментария']), time() + 60, '/');
         }
 
         // Redirect back to post
