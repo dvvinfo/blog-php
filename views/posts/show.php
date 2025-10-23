@@ -68,6 +68,22 @@ $isOwner = $currentUserId === $post->user_id;
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Комментарии (<?= count($comments) ?>)</h2>
 
     <?php if ($isAuthenticated): ?>
+        <?php 
+        $commentErrors = Session::get('comment_errors');
+        if ($commentErrors) {
+            Session::set('comment_errors', null);
+        }
+        ?>
+        <?php if (!empty($commentErrors)): ?>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <ul class="list-disc list-inside">
+                    <?php foreach ($commentErrors as $error): ?>
+                        <li><?= htmlspecialchars($error) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+        
         <form method="POST" action="/posts/<?= $post->id ?>/comments" class="mb-6">
             <textarea 
                 name="text" 
