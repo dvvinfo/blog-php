@@ -13,11 +13,11 @@ $userLogin = Session::get('user_login');
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 flex flex-col min-h-screen">
     <nav class="bg-white shadow-lg">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center py-4">
-                <div class="flex space-x-7">
+                <div class="flex space-x-7 items-center">
                     <div>
                         <a href="/" class="flex items-center">
                             <span class="font-semibold text-gray-800 text-lg">Личный блог</span>
@@ -42,4 +42,4 @@ $userLogin = Session::get('user_login');
             </div>
         </div>
     </nav>
-    <main class="max-w-6xl mx-auto px-4 py-8">
+    <main class="flex-grow max-w-6xl mx-auto px-4 py-8 w-full">
