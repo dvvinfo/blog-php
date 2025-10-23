@@ -18,7 +18,7 @@ services:
       docker-php-ext-install pdo pdo_mysql &&
       a2enmod rewrite &&
       curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer &&
-      cd /var/www/html && composer install --no-interaction --optimize-autoloader &&
+      cd /var/www/html && composer update --no-interaction --optimize-autoloader &&
       echo '<VirtualHost *:80>
         DocumentRoot /var/www/html/public
         <Directory /var/www/html/public>
