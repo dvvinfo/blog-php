@@ -1,0 +1,34 @@
+# IDE and Editor files
+.idea/
+.vscode/
+.kiro/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# PHP
+vendor/
+composer.lock
+
+# Configuration files with sensitive data
+config/database.php
+
+# Logs
+*.log
+logs/
+
+# Cache
+cache/
+tmp/
+
+# Node modules (if using npm for Tailwind)
+node_modules/
+package-lock.json
+
+# Build files
+public/css/styles.css
+dist/
